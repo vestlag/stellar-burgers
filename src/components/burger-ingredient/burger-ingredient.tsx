@@ -11,7 +11,6 @@ export const BurgerIngredient: FC<TBurgerIngredientProps> = memo(
     const dispatch = useDispatch();
 
     const handleAdd = () => {
-      console.log('Клик по ингредиенту:', ingredient.name);
       dispatch(addIngredient(ingredient));
     };
 

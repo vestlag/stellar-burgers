@@ -60,7 +60,6 @@ export const checkUserAuth = createAsyncThunk(
         const response = await getUserApi();
         return response.user;
       } catch (error) {
-        // Если токен протух, logout
         dispatch(logoutUser());
         return null;
       }

@@ -1,24 +1,24 @@
-import { ConstructorPage } from '@pages';
-import { Feed } from '@pages';
-import { Login } from '@pages';
-import { Register } from '@pages';
-import { ForgotPassword } from '@pages';
-import { ResetPassword } from '@pages';
-import { Profile } from '@pages';
-import { ProfileOrders } from '@pages';
-import { NotFound404 } from '@pages';
-
+import {
+  ConstructorPage,
+  Feed,
+  Login,
+  Register,
+  ForgotPassword,
+  ResetPassword,
+  Profile,
+  ProfileOrders,
+  NotFound404
+} from '@pages';
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-
 import '../../index.css';
 import styles from './app.module.css';
-
 import { AppHeader } from '@components';
 import { IngredientDetails, Modal, OrderInfo } from '@components';
-import { ProtectedRoute } from '../protected-route'; // создадим позже
+import { ProtectedRoute } from '../protected-route';
 import { useDispatch } from '../../services/store';
 import { getIngredients } from '../../services/slices/ingredientsSlice';
+import { checkUserAuth } from '../../services/slices/userSlice';
 
 const App = () => {
   const location = useLocation();
@@ -27,6 +27,7 @@ const App = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(checkUserAuth());
     dispatch(getIngredients());
   }, [dispatch]);
 
@@ -40,6 +41,8 @@ const App = () => {
       <Routes location={background || location}>
         <Route path='/' element={<ConstructorPage />} />
         <Route path='/feed' element={<Feed />} />
+        <Route path='/feed/:number' element={<OrderInfo />} />
+        <Route path='/ingredients/:id' element={<IngredientDetails />} />
         <Route
           path='/login'
           element={
@@ -85,6 +88,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <ProfileOrders />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/profile/orders/:number'
+          element={
+            <ProtectedRoute>
+              <OrderInfo />
             </ProtectedRoute>
           }
         />
