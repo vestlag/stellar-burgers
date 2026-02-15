@@ -1,4 +1,3 @@
-// src/services/store.ts
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import {
   TypedUseSelectorHook,

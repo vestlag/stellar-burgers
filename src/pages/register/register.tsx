@@ -1,4 +1,3 @@
-// src/pages/register/register.tsx
 import { FC, SyntheticEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RegisterUI } from '@ui-pages';

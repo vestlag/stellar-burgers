@@ -1,4 +1,3 @@
-// src/components/order-info/order-info.tsx
 import { FC, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector } from '../../services/store';
@@ -12,7 +11,6 @@ export const OrderInfo: FC = () => {
   const userOrders = useSelector((state) => state.orders.orders);
   const ingredients = useSelector((state) => state.ingredients.ingredients);
 
-  // Ищем заказ по номеру сначала в ленте, потом в истории заказов
   const orderData = [...orders, ...userOrders].find(
     (item) => item.number === Number(number)
   );

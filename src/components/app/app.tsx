@@ -1,4 +1,3 @@
-// src/components/app/app.tsx
 import { ConstructorPage } from '@pages';
 import { Feed } from '@pages';
 import { Login } from '@pages';

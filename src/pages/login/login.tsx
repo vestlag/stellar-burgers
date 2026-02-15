@@ -1,4 +1,3 @@
-// src/pages/login/login.tsx
 import { FC, SyntheticEvent, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LoginUI } from '@ui-pages';

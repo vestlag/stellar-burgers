@@ -1,4 +1,3 @@
-// src/services/slices/userSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {
   TLoginData,

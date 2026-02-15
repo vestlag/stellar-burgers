@@ -1,4 +1,3 @@
-// src/components/protected-route.tsx
 import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from '../services/store';
@@ -17,12 +16,10 @@ export const ProtectedRoute = ({
   const location = useLocation();
 
   if (!onlyUnAuth && !isAuth) {
-    // пользователь не авторизован, а роут требует авторизации
     return <Navigate to='/login' state={{ from: location }} />;
   }
 
   if (onlyUnAuth && isAuth) {
-    // пользователь авторизован, а роут только для неавторизованных
     return <Navigate to='/' />;
   }
 

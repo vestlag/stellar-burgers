@@ -1,7 +1,6 @@
-// src/services/slices/burgerConstructorSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { TConstructorIngredient, TIngredient } from '@utils-types';
-import { v4 as uuidv4 } from 'uuid'; // нужно установить: npm install uuid @types/uuid
+import { v4 as uuidv4 } from 'uuid'; 
 
 type BurgerConstructorState = {
   bun: TConstructorIngredient | null;

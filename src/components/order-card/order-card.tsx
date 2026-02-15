@@ -1,4 +1,3 @@
-// src/components/order-card/order-card.tsx
 import { FC, memo, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useSelector } from '../../services/store';

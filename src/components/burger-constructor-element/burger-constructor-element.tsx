@@ -1,4 +1,3 @@
-// src/components/burger-constructor-element/burger-constructor-element.tsx
 import { FC, memo } from 'react';
 import { useDispatch } from '../../services/store';
 import { BurgerConstructorElementUI } from '@ui';
