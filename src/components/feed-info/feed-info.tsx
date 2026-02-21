@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { useSelector } from '../../services/store';
 import { TOrder } from '@utils-types';
 import { FeedInfoUI } from '../ui/feed-info';
@@ -11,10 +11,10 @@ const getOrders = (orders: TOrder[], status: string): number[] =>
 
 export const FeedInfo: FC = () => {
   const orders = useSelector((state) => state.feeds.orders);
-  const feed = useSelector((state) => ({
-    total: state.feeds.total,
-    totalToday: state.feeds.totalToday
-  }));
+  const total = useSelector((state) => state.feeds.total);
+  const totalToday = useSelector((state) => state.feeds.totalToday);
+
+  const feed = useMemo(() => ({ total, totalToday }), [total, totalToday]);
 
   const readyOrders = getOrders(orders, 'done');
   const pendingOrders = getOrders(orders, 'pending');
