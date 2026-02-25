@@ -6,7 +6,7 @@ import { RootState } from '../store';
 type OrderState = {
   orderRequest: boolean;
   orderModalData: TOrder | null;
-  currentOrder: TOrder | null; // для просмотра конкретного заказа
+  currentOrder: TOrder | null;
   loading: boolean;
   error: string | null;
 };

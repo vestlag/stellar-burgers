@@ -7,7 +7,6 @@ import burgerConstructorReducer, {
 } from '../burgerConstructorSlice';
 import { TIngredient } from '@utils-types';
 
-// Локальное начальное состояние
 const initialState = {
   bun: null,
   ingredients: []
@@ -15,7 +14,9 @@ const initialState = {
 
 describe('burgerConstructor slice', () => {
   it('должен возвращать начальное состояние', () => {
-    expect(burgerConstructorReducer(undefined, { type: '' })).toEqual(initialState);
+    expect(burgerConstructorReducer(undefined, { type: '' })).toEqual(
+      initialState
+    );
   });
 
   it('должен добавлять булку', () => {
