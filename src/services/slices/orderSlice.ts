@@ -6,7 +6,7 @@ import { RootState } from '../store';
 type OrderState = {
   orderRequest: boolean;
   orderModalData: TOrder | null;
-  currentOrder: TOrder | null;
+  currentOrder: TOrder | null; // для просмотра конкретного заказа
   loading: boolean;
   error: string | null;
 };
@@ -19,33 +19,31 @@ const initialState: OrderState = {
   error: null
 };
 
-export const postOrder = createAsyncThunk<
-  TOrder,
-  void,
-  { state: RootState }
->('order/postOrder', async (_, { getState }) => {
-  const state = getState();
-  const constructorItems = state.burgerConstructor;
-  if (!constructorItems.bun) {
-    throw new Error('Добавьте булку');
+export const postOrder = createAsyncThunk(
+  'order/postOrder',
+  async (_, { getState }) => {
+    const state = getState() as RootState;
+    const constructorItems = state.burgerConstructor;
+    if (!constructorItems.bun) {
+      throw new Error('Добавьте булку');
+    }
+    const ingredientsIds = [
+      constructorItems.bun._id,
+      ...constructorItems.ingredients.map((item) => item._id),
+      constructorItems.bun._id
+    ];
+    const response = await orderBurgerApi(ingredientsIds);
+    return response.order;
   }
-  const ingredientsIds = [
-    constructorItems.bun._id,
-    ...constructorItems.ingredients.map((item) => item._id),
-    constructorItems.bun._id
-  ];
-  const response = await orderBurgerApi(ingredientsIds);
-  return response.order;
-});
+);
 
-export const getOrderByNumber = createAsyncThunk<
-  TOrder,
-  number,
-  { state: RootState }
->('order/getByNumber', async (number) => {
-  const response = await getOrderByNumberApi(number);
-  return response.orders[0];
-});
+export const getOrderByNumber = createAsyncThunk(
+  'order/getByNumber',
+  async (number: number) => {
+    const response = await getOrderByNumberApi(number);
+    return response.orders[0];
+  }
+);
 
 const orderSlice = createSlice({
   name: 'order',
@@ -60,6 +58,7 @@ const orderSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // postOrder
       .addCase(postOrder.pending, (state) => {
         state.orderRequest = true;
         state.error = null;
@@ -72,6 +71,7 @@ const orderSlice = createSlice({
         state.orderRequest = false;
         state.error = action.error.message || 'Ошибка создания заказа';
       })
+      // getOrderByNumber
       .addCase(getOrderByNumber.pending, (state) => {
         state.loading = true;
         state.error = null;

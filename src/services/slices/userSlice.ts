@@ -26,63 +26,55 @@ const initialState: UserState = {
   error: null
 };
 
-export const registerUser = createAsyncThunk<
-  TUser,
-  TRegisterData,
-  { state: RootState }
->('user/register', async (data) => {
-  const response = await registerUserApi(data);
-  setCookie('accessToken', response.accessToken);
-  localStorage.setItem('refreshToken', response.refreshToken);
-  return response.user;
-});
+export const registerUser = createAsyncThunk(
+  'user/register',
+  async (data: TRegisterData) => {
+    const response = await registerUserApi(data);
+    setCookie('accessToken', response.accessToken);
+    localStorage.setItem('refreshToken', response.refreshToken);
+    return response.user;
+  }
+);
 
-export const loginUser = createAsyncThunk<
-  TUser,
-  TLoginData,
-  { state: RootState }
->('user/login', async (data) => {
-  const response = await loginUserApi(data);
-  setCookie('accessToken', response.accessToken);
-  localStorage.setItem('refreshToken', response.refreshToken);
-  return response.user;
-});
+export const loginUser = createAsyncThunk(
+  'user/login',
+  async (data: TLoginData) => {
+    const response = await loginUserApi(data);
+    setCookie('accessToken', response.accessToken);
+    localStorage.setItem('refreshToken', response.refreshToken);
+    return response.user;
+  }
+);
 
-export const logoutUser = createAsyncThunk<
-  void,
-  void,
-  { state: RootState }
->('user/logout', async () => {
+export const logoutUser = createAsyncThunk('user/logout', async () => {
   await logoutApi();
   deleteCookie('accessToken');
   localStorage.removeItem('refreshToken');
 });
 
-export const checkUserAuth = createAsyncThunk<
-  TUser | null,
-  void,
-  { state: RootState; dispatch: any }
->('user/checkAuth', async (_, { dispatch }) => {
-  if (getCookie('accessToken')) {
-    try {
-      const response = await getUserApi();
-      return response.user;
-    } catch (error) {
-      dispatch(logoutUser());
-      return null;
+export const checkUserAuth = createAsyncThunk(
+  'user/checkAuth',
+  async (_, { dispatch }) => {
+    if (getCookie('accessToken')) {
+      try {
+        const response = await getUserApi();
+        return response.user;
+      } catch (error) {
+        dispatch(logoutUser());
+        return null;
+      }
     }
+    return null;
   }
-  return null;
-});
+);
 
-export const updateUser = createAsyncThunk<
-  TUser,
-  Partial<TRegisterData>,
-  { state: RootState }
->('user/update', async (user) => {
-  const response = await updateUserApi(user);
-  return response.user;
-});
+export const updateUser = createAsyncThunk(
+  'user/update',
+  async (user: Partial<TRegisterData>) => {
+    const response = await updateUserApi(user);
+    return response.user;
+  }
+);
 
 const userSlice = createSlice({
   name: 'user',
@@ -90,6 +82,7 @@ const userSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // register
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -104,6 +97,7 @@ const userSlice = createSlice({
         state.error = action.error.message || 'Ошибка регистрации';
         state.isAuthChecked = true;
       })
+      // login
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -118,6 +112,7 @@ const userSlice = createSlice({
         state.error = action.error.message || 'Ошибка входа';
         state.isAuthChecked = true;
       })
+      // checkAuth
       .addCase(checkUserAuth.pending, (state) => {
         state.loading = true;
       })
@@ -131,10 +126,12 @@ const userSlice = createSlice({
         state.user = null;
         state.isAuthChecked = true;
       })
+      // logout
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.isAuthChecked = true;
       })
+      // update user
       .addCase(updateUser.pending, (state) => {
         state.loading = true;
         state.error = null;
