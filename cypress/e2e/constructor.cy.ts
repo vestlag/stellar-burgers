@@ -2,20 +2,18 @@
 
 describe('Конструктор бургера', () => {
   beforeEach(() => {
-    // Перехватываем запрос ингредиентов и возвращаем мок
+    // Перехватываем запросы
     cy.intercept('GET', 'api/ingredients', { fixture: 'ingredients.json' }).as(
       'getIngredients'
     );
-    // Перехватываем запрос пользователя (авторизация)
     cy.intercept('GET', 'api/auth/user', { fixture: 'user.json' }).as(
       'getUser'
     );
-    // Перехватываем запрос создания заказа
     cy.intercept('POST', 'api/orders', { fixture: 'order.json' }).as(
       'postOrder'
     );
 
-    // Устанавливаем токены (имитация авторизации)
+    // Устанавливаем токены
     cy.setCookie('accessToken', 'test-access-token');
     localStorage.setItem('refreshToken', 'test-refresh-token');
 
@@ -23,32 +21,56 @@ describe('Конструктор бургера', () => {
     cy.wait('@getIngredients');
   });
 
+  afterEach(() => {
+    // Очищаем конструктор после каждого теста
+    cy.window().then((win) => {
+      win.localStorage.clear();
+    });
+    cy.clearCookies();
+  });
+
   it('должен открывать и закрывать модальное окно ингредиента', () => {
-    // Клик по первому ингредиенту
-    cy.get('[data-cy=ingredient-item]').first().click();
-    // Проверяем, что модалка с деталями открылась
-    cy.contains('Детали ингредиента').should('be.visible');
-    // Закрываем по крестику (ищем кнопку с иконкой закрытия внутри модалки)
-    cy.get('[data-cy=modal] button').click();
-    // Проверяем, что модалка закрылась
-    cy.contains('Детали ингредиента').should('not.exist');
+    cy.fixture('ingredients.json').then((ingredients) => {
+      const firstIngredientName = ingredients.data[0].name;
+
+      // Клик по первому ингредиенту
+      cy.get('[data-cy=ingredient-item]').first().click();
+
+      // Проверяем, что модалка открылась
+      cy.contains('Детали ингредиента').should('be.visible');
+
+      // Проверяем, что внутри модалки отображается название выбранного ингредиента
+      cy.get('[data-cy=modal]').within(() => {
+        cy.contains(firstIngredientName).should('be.visible');
+      });
+
+      // Закрываем модалку
+      cy.get('[data-cy=modal] button').click();
+
+      // Ждём исчезновения модалки
+      cy.get('[data-cy=modal]').should('not.exist');
+
+      // Проверяем, что заголовок модалки исчез (опционально)
+      cy.contains('Детали ингредиента').should('not.exist');
+    });
   });
 
   it('должен добавлять ингредиент в конструктор', () => {
     // Наводим мышь на ингредиент и кликаем кнопку "Добавить"
     cy.get('[data-cy=ingredient-item]').first().trigger('mouseover');
     cy.contains('button', 'Добавить').click();
-    // Проверяем, что булка появилась в конструкторе (ищем по тексту)
+
+    // Проверяем, что булка появилась в конструкторе
     cy.contains('Краторная булка N-200i (верх)').should('be.visible');
     cy.contains('Краторная булка N-200i (низ)').should('be.visible');
   });
 
   it('должен создавать заказ и очищать конструктор', () => {
-    // Добавляем булку через кнопку "Добавить"
+    // Добавляем булку
     cy.get('[data-cy=ingredient-item]').first().trigger('mouseover');
     cy.contains('button', 'Добавить').click();
 
-    // Добавляем начинку (второй ингредиент)
+    // Добавляем начинку
     cy.get('[data-cy=ingredient-item]').eq(1).trigger('mouseover');
     cy.contains('button', 'Добавить').click();
 
@@ -58,22 +80,17 @@ describe('Конструктор бургера', () => {
     // Ждём ответа от сервера
     cy.wait('@postOrder', { timeout: 10000 });
 
-    // Проверяем, что модальное окно с номером заказа открылось
+    // Проверяем модалку заказа
     cy.contains('идентификатор заказа').should('be.visible');
     cy.get('[data-cy=order-number]').should('contain', '12345');
 
     // Закрываем модалку
     cy.get('[data-cy=modal] button').click();
 
-    // Ждём немного, чтобы модалка закрылась и конструктор обновился
-    cy.wait(500);
-
-    // Проверяем, что конструктор пуст (нет ингредиентов)
-    // Используем более точные селекторы
+    // Проверяем, что конструктор пуст
     cy.get('[data-cy=constructor-drop-area]').within(() => {
       cy.contains('Краторная булка N-200i').should('not.exist');
       cy.contains('Биокотлета из марсианской Магнолии').should('not.exist');
-      // Проверяем, что отображается сообщение о выборе булки
       cy.contains('Выберите булки').should('be.visible');
     });
   });
